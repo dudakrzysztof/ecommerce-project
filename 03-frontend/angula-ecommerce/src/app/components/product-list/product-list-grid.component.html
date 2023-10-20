@@ -1,8 +1,11 @@
 <div class="main-content">
     <div class="section-content section-content-p30">
  
-        <h4>Category: {{ currentCategoryName }}</h4>
-        <hr>
+        <div class="h2">
+            <div *ngIf="searchMode == false; else myElseBlock">Category: {{ currentCategoryName }}</div>
+            <ng-template #myElseBlock>Search for: "{{currentCategoryName}}" </ng-template>
+            <hr>
+        </div>
  
         <div class="container-fluid">
             <div class="row">
@@ -15,6 +18,11 @@
                         <div class="price">{{ tempProduct.unitPrice | currency:'USD' }}</div>
                         <a href="#" class="primary-btn">Add to cart</a>
                     </div>
+                </div>
+
+                <!-- if products empty then display a message -->
+                <div *ngIf="products?.length == 0" class="alert alert-warning col-md-12" role="alert">
+                    No products found
                 </div>
 
             </div>

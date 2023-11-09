@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/common/product';
 import { ProductService } from 'src/app/services/product.service';
 import { ActivatedRoute } from '@angular/router';
+import { CartService } from 'src/app/services/cart.service';
+import { CartItem } from 'src/app/common/cart-item';
 
 @Component({
   selector: 'app-product-list',
@@ -13,7 +15,7 @@ export class ProductListComponent {
   products: Product[] = [];
   currentCategoryId: number = 1;
   previousCategoryId: number = 1;
-  currentCategoryName: string = "";
+  theKeyword: string = "";
   searchMode: boolean = false;
 
   // new properties for pagination
@@ -24,7 +26,9 @@ export class ProductListComponent {
   previousKeyword: string = "";
 
   constructor(private productService: ProductService,
-    private route: ActivatedRoute) { }
+              private cartService: CartService,
+              private route: ActivatedRoute) { }
+
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(() => {
@@ -44,24 +48,23 @@ export class ProductListComponent {
   }
 
   handleSearchProducts() {
-    const theKeyword: string = this.route.snapshot.paramMap.get('keyword')!;
-    this.currentCategoryName = this.route.snapshot.paramMap.get('keyword')!;
-
+    this.theKeyword = this.route.snapshot.paramMap.get('keyword')!;
+    
     // if we have a different keyword than previous
     // then set thePageNumber to 1
 
-    if (this.previousKeyword != theKeyword){
+    if (this.previousKeyword != this.theKeyword){
       this.thePageNumber = 1;
     }
 
-    this.previousKeyword = theKeyword;
+    this.previousKeyword = this.theKeyword;
 
-    console.log(`keyword=${theKeyword}, thePageNumber=${this.thePageNumber}`);
+    console.log(`keyword=${this.theKeyword}, thePageNumber=${this.thePageNumber}`);
 
     // now search for the products using keyword
     this.productService.searchProductsPaginate(this.thePageNumber - 1,
                                                this.thePageSize,
-                                               theKeyword)
+                                               this.theKeyword)
                                                 .subscribe(this.processResult());
   }
 
@@ -73,12 +76,12 @@ export class ProductListComponent {
       // get the "id" parameter string. Convert string to a number using the "+" symbol
       this.currentCategoryId = +this.route.snapshot.paramMap.get("id")!;
       // get the "name" param string
-      this.currentCategoryName = this.route.snapshot.paramMap.get('name')!;
+      this.theKeyword = this.route.snapshot.paramMap.get('name')!;
     }
     else {
       // not category id available ... default to category id 1
       this.currentCategoryId = 1;
-      this.currentCategoryName = 'Books';
+      this.theKeyword = 'Books';
     }
 
     //
@@ -118,4 +121,11 @@ export class ProductListComponent {
     }
   }
 
+  addToCart(theProduct: Product){
+    console.log(`Adding to cart: ${theProduct.name}, ${theProduct.unitPrice}`);
+
+    // TODO
+    const cartItem = new CartItem(theProduct);
+    this.cartService.addToCart(cartItem);
+  }
 }

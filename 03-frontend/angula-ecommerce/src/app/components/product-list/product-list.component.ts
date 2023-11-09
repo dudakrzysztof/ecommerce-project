@@ -124,7 +124,6 @@ export class ProductListComponent {
   addToCart(theProduct: Product){
     console.log(`Adding to cart: ${theProduct.name}, ${theProduct.unitPrice}`);
 
-    // TODO
     const cartItem = new CartItem(theProduct);
     this.cartService.addToCart(cartItem);
   }

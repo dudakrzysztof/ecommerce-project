@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartItem } from '../common/cart-item';
-import { Subject } from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +9,8 @@ export class CartService {
 
   cartItems: CartItem[] = [];
 
-  totalPrice: Subject<number> = new Subject<number>();
-  totalQuantity: Subject<number> = new Subject<number>();
+  totalPrice: Subject<number> = new BehaviorSubject<number>(0);
+  totalQuantity: Subject<number> = new BehaviorSubject<number>(0);
 
   constructor() { }
 
@@ -28,7 +28,7 @@ export class CartService {
       //     break;
       //   }
       // }
-      
+
       // instead of for loop
       existingCartItem = this.cartItems.find(tempCartItem => tempCartItem.id ===theCartItem.id);
 
@@ -71,9 +71,9 @@ export class CartService {
     console.log('Contents of the cart')
     for (let tempCartItem of this.cartItems){
       const subTotalPrice = tempCartItem.quantity * tempCartItem.unitPrice;
-      console.log(`name=${tempCartItem.name}, 
-                   quantity=${tempCartItem.quantity}, 
-                   unitPrice=${tempCartItem.unitPrice}, 
+      console.log(`name=${tempCartItem.name},
+                   quantity=${tempCartItem.quantity},
+                   unitPrice=${tempCartItem.unitPrice},
                    subTotalPrice=${subTotalPrice}`);
     }
     console.log(`totalPriceValue=${totalPriceValue.toFixed(2)}, totalQuantityValue=${totalQuantityValue}`)

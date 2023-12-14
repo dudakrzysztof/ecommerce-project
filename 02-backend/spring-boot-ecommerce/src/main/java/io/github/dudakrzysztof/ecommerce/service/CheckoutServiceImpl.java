@@ -36,7 +36,8 @@ public class CheckoutServiceImpl implements CheckoutService{
 
         // populate order with orderItems
         Set<OrderItem> orderItems = purchase.getOrderItems();
-        orderItems.forEach(item -> order.add(item));
+        orderItems.forEach(order::add);
+        // orderItems.forEach(item -> order.add(item)); -> same as above
 
         // populate order with billingAddress and shippingAddress
         order.setBillingAddress(purchase.getBillingAddress());
@@ -44,6 +45,16 @@ public class CheckoutServiceImpl implements CheckoutService{
 
         // populate customer with order
         Customer customer = purchase.getCustomer();
+
+        // check if this is an existing customer
+        String theEmail = customer.getEmail();
+        Customer customerFromDB = customerRepository.findByEmail(theEmail);
+
+        if (customerFromDB != null) {
+            // we found them ... let's assign them accordingly
+            customer = customerFromDB;
+        }
+
         customer.add(order);
 
         // save to the database

@@ -1,11 +1,9 @@
 package io.github.dudakrzysztof.ecommerce.config;
 
-import io.github.dudakrzysztof.ecommerce.entity.Country;
-import io.github.dudakrzysztof.ecommerce.entity.Product;
-import io.github.dudakrzysztof.ecommerce.entity.ProductCategory;
-import io.github.dudakrzysztof.ecommerce.entity.State;
+import io.github.dudakrzysztof.ecommerce.entity.*;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -22,6 +20,9 @@ import java.util.Set;
 @Configuration
 public class MyDataRestConfig implements RepositoryRestConfigurer {
 
+    @Value("${allowed.origins}")
+    private String[] theAllowedOrigins;
+
     private EntityManager entityManager;
 
     @Autowired
@@ -32,7 +33,7 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
 
-        HttpMethod[] theUnsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
+        HttpMethod[] theUnsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH};
 
         // disable HTTP methods for Product: PUT, POST, DELETE
         disableHttpMethods(Product.class, config, theUnsupportedActions);
@@ -40,9 +41,13 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         disableHttpMethods(ProductCategory.class, config, theUnsupportedActions);
         disableHttpMethods(State.class, config, theUnsupportedActions);
         disableHttpMethods(Country.class, config, theUnsupportedActions);
+        disableHttpMethods(Order.class, config, theUnsupportedActions);
 
         // call an internal helper method
         exposeIds(config);
+
+        // configure cors mapping
+        cors.addMapping(config.getBasePath() + "/**").allowedOrigins(theAllowedOrigins);
     }
 
     // disable HTTP methods: PUT, POST, DELETE
